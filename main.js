@@ -29,7 +29,7 @@ const renderProducts = (BD) => {
                         let filter = item.value;
                         let newBD = BD.filter(item => item.size == filter);
                         store.innerHTML = "";
-                        showProducts(newBD, store);
+                        showProducts(newBD, store, BD);
                     }
                 })
             }
@@ -48,7 +48,7 @@ const renderProducts = (BD) => {
                             case "Menor":
                                 newBD = BD.sort((a, b) => a.price - b.price);
                                 store.innerHTML = "";
-                                showProducts(newBD, store);
+                                showProducts(newBD, store, BD);
                                 break;
                         }
                     }
@@ -61,7 +61,7 @@ const renderProducts = (BD) => {
                         let filter = item.value;
                         let newBD = BD.filter(item => item.brand == filter);
                         store.innerHTML = "";
-                        showProducts(newBD, store);
+                        showProducts(newBD, store, BD);
                     }
                 })
             }
@@ -71,7 +71,7 @@ const renderProducts = (BD) => {
     showProducts(BD, store);
 }
 
-const showProducts = (newBD, store) => {
+const showProducts = (newBD, store, BD) => {
     newBD.forEach((item) => {
         let product = document.createElement("div");
         product.classList.add("container");
@@ -84,12 +84,12 @@ const showProducts = (newBD, store) => {
             </div>`;
         store.appendChild(product);
         product.querySelector("button").addEventListener(("click"), () => {
-            addcarrito(item.id)
+            addcarrito(item.i, BD)
         })
     });
 };
 
-const addcarrito = (id) => {
+const addcarrito = (id, BD) => {
     let product = BD.find(product => product.id === id);
     let productcar = shoppingcart.find(product => product.id === id);
     if (productcar) {
