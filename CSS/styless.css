@@ -93,14 +93,52 @@ footer {
   top: 30px;
   right: -15px;
   width: 300px;
-  height: 100%;
+  padding: 1em;
   background-color: #f4f9fb;
   box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
   border-radius: 10px;
   z-index: 1; }
+  .shoppingcart__container hr {
+    width: 200px; }
+  .shoppingcart__container button {
+    margin-top: 10px;
+    margin-bottom: 10px;
+    margin-left: 60px;
+    padding: .5em;
+    font-size: .8em;
+    font-family: "Kumbh Sans", sans-serif;
+    color: #ff7d1a;
+    background-color: inherit;
+    border: 2px solid #ff7d1a;
+    border-radius: 10px; }
+    .shoppingcart__container button:hover {
+      cursor: pointer; }
 
 .active_cart {
-  display: block; }
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-direction: column; }
+
+.box {
+  width: 100%;
+  height: 50px;
+  padding: .5em .5em;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between; }
+  .box_img {
+    width: 30px; }
+  .box div {
+    padding: .5em .5em; }
+    .box div h4 {
+      font-family: "Kumbh Sans", sans-serif;
+      font-size: .5em; }
+    .box div p {
+      font-size: .7em; }
+  .box .delate:hover {
+    cursor: pointer; }
 
 body {
   position: relative;

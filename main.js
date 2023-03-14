@@ -1,16 +1,15 @@
 document.addEventListener("DOMContentLoaded", cargainicial);
-const shoppingcart = [];
+const shoppingcart = JSON.parse(sessionStorage.getItem("shoppingcart")) || [];
 
 function cargainicial() {
     getData();
-    renderProducts();
     rendershoppingcart();
 }
 const getData = async () => {
     try {
         const response = await fetch("./data.json")
         const BD = await response.json()
-        renderProducts(BD);
+        showProducts(BD)
     } catch (Error) {
         alert("Error en la matrix")
     }
@@ -22,56 +21,58 @@ const renderProducts = (BD) => {
     buttons.forEach((item, i) => {
         buttons[i].addEventListener("click", () => {
             let activo = document.getElementsByClassName("activo");
-            if (activo[0].attributes.id.nodeValue == "size") {
-                let checks = [...document.getElementsByClassName("size")];
-                checks.forEach((item, i) => {
-                    if (item.checked) {
-                        let filter = item.value;
-                        let newBD = BD.filter(item => item.size == filter);
-                        store.innerHTML = "";
-                        showProducts(newBD, store, BD);
-                    }
-                })
-            }
-            if (activo[0].attributes.id.nodeValue == "price") {
-                let checks = [...document.getElementsByClassName("price")];
-                checks.forEach((item, i) => {
-                    if (item.checked) {
-                        let filter = item.value;
-                        let newBD;
-                        switch (filter) {
-                            case "Mayor":
-                                newBD = BD.sort((a, b) => b.price - a.price);
-                                store.innerHTML = "";
-                                showProducts(newBD, store);
-                                break;
-                            case "Menor":
-                                newBD = BD.sort((a, b) => a.price - b.price);
-                                store.innerHTML = "";
-                                showProducts(newBD, store, BD);
-                                break;
+            if (activo.length > 0) {
+                if (activo[0].attributes.id.nodeValue == "size") {
+                    let checks = [...document.getElementsByClassName("size")];
+                    checks.forEach((item, i) => {
+                        if (item.checked) {
+                            let filter = item.value;
+                            let newBD = BD.filter(item => item.size == filter);
+                            store.innerHTML = "";
+                            showProducts(newBD);
                         }
-                    }
-                })
-            }
-            if (activo[0].attributes.id.nodeValue == "brand") {
-                let checks = [...document.getElementsByClassName("brand")];
-                checks.forEach((item, i) => {
-                    if (item.checked) {
-                        let filter = item.value;
-                        let newBD = BD.filter(item => item.brand == filter);
-                        store.innerHTML = "";
-                        showProducts(newBD, store, BD);
-                    }
-                })
+                    })
+                }
+                if (activo[0].attributes.id.nodeValue == "price") {
+                    let checks = [...document.getElementsByClassName("price")];
+                    checks.forEach((item, i) => {
+                        if (item.checked) {
+                            let filter = item.value;
+                            let newBD;
+                            switch (filter) {
+                                case "Mayor":
+                                    newBD = BD.sort((a, b) => b.price - a.price);
+                                    store.innerHTML = "";
+                                    showProducts(newBD);
+                                    break;
+                                case "Menor":
+                                    newBD = BD.sort((a, b) => a.price - b.price);
+                                    store.innerHTML = "";
+                                    showProducts(newBD);
+                                    break;
+                            }
+                        }
+                    })
+                }
+                if (activo[0].attributes.id.nodeValue == "brand") {
+                    let checks = [...document.getElementsByClassName("brand")];
+                    checks.forEach((item, i) => {
+                        if (item.checked) {
+                            let filter = item.value;
+                            let newBD = BD.filter(item => item.brand == filter);
+                            store.innerHTML = "";
+                            showProducts(newBD);
+                        }
+                    })
+                }
             }
         });
         modal_filter.style.display = "none";
     });
-    showProducts(BD, store);
 }
 
-const showProducts = (newBD, store, BD) => {
+const showProducts = (newBD) => {
+    const store = document.getElementById("store");
     newBD.forEach((item) => {
         let product = document.createElement("div");
         product.classList.add("container");
@@ -83,15 +84,18 @@ const showProducts = (newBD, store, BD) => {
                 <button id="${item.id}"> Añadir al Carrito </button>
             </div>`;
         store.appendChild(product);
-        product.querySelector("button").addEventListener(("click"), () => {
-            addcarrito(item.i, BD)
+        product.querySelector("button").addEventListener(("click"), (e) => {
+            addcarrito(e.target.id, newBD);
+            rendershoppingcontainer();
         })
     });
+    renderProducts(newBD);
 };
 
 const addcarrito = (id, BD) => {
-    let product = BD.find(product => product.id === id);
-    let productcar = shoppingcart.find(product => product.id === id);
+    const producID = parseInt(id);
+    let product = BD.find(product => product.id === producID);
+    let productcar = shoppingcart.some(product => product.id === producID);
     if (productcar) {
         productcar.cantidad++;
     } else {
@@ -101,12 +105,45 @@ const addcarrito = (id, BD) => {
     sessionStorage.setItem("shoppingcart", JSON.stringify(shoppingcart));
     rendershoppingcart()
 }
-const rendershoppingcart = (shopping_container) => {
+const rendershoppingcart = () => {
     let notification = document.getElementById("notification");
-    let shoppingcart = JSON.parse(sessionStorage.getItem("shoppingcart"));
-    if (shoppingcart) {
+    if (shoppingcart.length > 0) {
         notification.textContent = shoppingcart.length;
         notification.style.display = "block";
+    } else {
+        notification.style.display = "none";
     }
-    console.log(shoppingcart);
+}
+const rendershoppingcontainer = () => {
+    const shopping_container = document.getElementById("shopping_container");
+    shopping_container.innerHTML = "";
+    shoppingcart.forEach((product) => {
+        let box = document.createElement("li");
+        box.classList.add("box")
+        box.innerHTML = `
+        <img class="box_img" src="${product.img}">
+            <div>
+                <h4>${product.name}</h4>
+                <p>${new Intl.NumberFormat("es-Co").format(product.price)}</p>
+            </div>
+        <img id="${product.id}"class="delate" src="./ASSET/icon-delete.svg">`;
+        shopping_container.appendChild(box);
+        box.querySelector(".delate").addEventListener(("click"), (e) => {
+            delateprodut(e.target.id)
+        })
+    });
+    let button = document.createElement("div")
+    button.innerHTML = `
+    <hr>
+    <button>PAGAR</button>`;
+    shopping_container.appendChild(button);
+};
+
+const delateprodut = (id) => {
+    let producId = parseInt(id);
+    let productDelate = shoppingcart.find(item => item.id === producId);
+    shoppingcart.splice(shoppingcart.indexOf(productDelate), 1);
+    sessionStorage.setItem("shoppingcart", JSON.stringify(shoppingcart));
+    rendershoppingcontainer();
+    rendershoppingcart();
 }

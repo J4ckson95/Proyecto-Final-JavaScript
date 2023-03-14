@@ -52,7 +52,7 @@ shopping.addEventListener(("click"), () => {
     setTimeout(() => {
         shopping_container.classList.toggle("active_cart");
     }, 500);
-    rendershoppingcart(shopping_container);
+    rendershoppingcontainer();
 })
 
 
